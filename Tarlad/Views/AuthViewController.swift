@@ -8,6 +8,7 @@
 
 import UIKit
 import Alamofire
+import SocketIO
 
 class AuthViewController: UIViewController {
     
@@ -16,16 +17,14 @@ class AuthViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         view.endEditing(true)
     }
     
-    @IBAction func unwindAction(unwindSegue: UIStoryboardSegue) {
-        navigationController?.popViewController(animated: true)
+    @IBAction func unwindToLogin(unwindSegue: UIStoryboardSegue) {
+        
     }
     
     @IBAction func login(_ sender: Any) {
@@ -37,29 +36,23 @@ class AuthViewController: UIViewController {
         
         
         AF.request("http://192.168.0.108:3000/api/accounts/authorize",
-                   method: .post,
-                   parameters: login,
-                   encoder: JSONParameterEncoder.default).response { response in
-                    if (response.error != nil && response.data != nil) { return }
+           method: .post,
+           parameters: login,
+           encoder: JSONParameterEncoder.default).response { response in
+            if (response.error != nil && response.data != nil) { return }
 
-                    guard let token = try? JSONDecoder().decode(TokenDTO.self, from: response.data!) else { return }
+            guard let token = try? JSONDecoder().decode(TokenDTO.self, from: response.data ?? "".data(using: .utf8)!) else { return }
 
-                    print(token)
-
-                    UserDefaults.standard.set(token.token, forKey: "TOKEN")
-                    
-                    self.dismiss(animated: true, completion: nil)
+            UserDefaults.standard.set(token.token, forKey: "TOKEN")
+            
+            UserDefaults.standard.set(token.refreshToken.userId, forKey: "USERID")
+            
+            SocketIO.shared.setToken(token: token.token)
+            
+            SocketIO.shared.socket.connect()
+            
+            
+            self.performSegue(withIdentifier: "backToMain", sender: self)
         }
     }
-    
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

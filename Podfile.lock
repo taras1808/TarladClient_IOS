@@ -1,24 +1,28 @@
 PODS:
   - Alamofire (5.2.2)
+  - RxSwift (5.1.1)
   - Socket.IO-Client-Swift (15.2.0):
     - Starscream (~> 3.1)
   - Starscream (3.1.1)
 
 DEPENDENCIES:
   - Alamofire (~> 5.2)
+  - RxSwift (~> 5)
   - Socket.IO-Client-Swift (~> 15.2.0)
 
 SPEC REPOS:
   trunk:
     - Alamofire
+    - RxSwift
     - Socket.IO-Client-Swift
     - Starscream
 
 SPEC CHECKSUMS:
   Alamofire: 814429acc853c6c54ff123fc3d2ef66803823ce0
+  RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
   Socket.IO-Client-Swift: 1e3e3a1f09f3312a167f0d781eb2f383d477357c
   Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
 
-PODFILE CHECKSUM: 781e6ede914312f969901995a3b1d0320bee6087
+PODFILE CHECKSUM: db6ccecdb4fb6ccd1eae5cfc17f1e8fc0aba8e04
 
 COCOAPODS: 1.9.1

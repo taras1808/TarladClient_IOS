@@ -8,90 +8,146 @@
 
 import UIKit
 import Alamofire
+import RxSwift
+
 
 class MainViewController: UIViewController {
     
+    @IBOutlet weak var tableView: UITableView!
     
-    @IBOutlet weak var collectionView: UICollectionView!
+    var chats: [Chat] = []
+    var messages: [Message] = []
+    var users: [User] = []
+    var chatLists: [Int64: Set<User>] = [:]
     
-    let chats: [Token] = [ Token(value: "dsfdvdf", userId: 1),
-    Token(value: "2132", userId: 1),
-    Token(value: "32f34v", userId: 1),
-    Token(value: "v45v", userId: 1),
-    Token(value: "3crvc", userId: 1),
-    Token(value: "v4btrv", userId: 1)]
+    let disposeBag = DisposeBag()
+    
+    let vm = MainViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tabBarController?.title = "Tarlad"
+        navigationItem.title = "Tarlad"
         
-//        let image: UIImage = UIImage(named: "lamborghini")!
-//        let imageView = UIImageView(image: image)
-//        imageView.contentMode = .scaleAspectFit
-//        tabBarController?.navigationItem.titleView = imageView
+        tableView.delegate = self
+        tableView.dataSource = self
         
-        let logout = UIBarButtonItem(
-            barButtonSystemItem: UIBarButtonItem.SystemItem.stop,
-            target: self,
-            action: #selector(self.logout)
-        )
+        observeMessages()
+        observeUsers()
+        observeChats()
+        observeChatList()
         
-        tabBarController?.navigationItem.setRightBarButtonItems([logout], animated: true)
+        vm.observeMessages().disposed(by: disposeBag)
         
-        
-        self.collectionView.translatesAutoresizingMaskIntoConstraints = false
-        self.collectionView.register(UINib(nibName: "ChatCell", bundle: nil), forCellWithReuseIdentifier: "ChatCell")
-        self.collectionView.dataSource = self
-        self.collectionView.delegate = self
-        
-    
-        
+        vm.getMessages().disposed(by: self.disposeBag)
     }
     
-    @objc func logout(_ sender: UIButton) {
-        UserDefaults.standard.removeObject(forKey: "TOKEN")
-        performSegue(withIdentifier: "auth", sender: self)
+    @IBAction func unwindToMain(unwindSegue: UIStoryboardSegue) {
+        self.vm.page = 0
+        self.vm.time = Int64(Date().timeIntervalSince1970 * 1000)
+        self.chats = []
+        self.messages = []
+        self.users = []
+        self.chatLists = [:]
+        self.tableView.reloadData()
+        self.vm.getMessages().disposed(by: self.disposeBag)
     }
     
-    
-    
+    func observeMessages() {
+        vm.messages.bind(listener: { messages in
+            if messages.count == 0 { return }
+            for message in messages {
 
-    
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+                if !self.chats.map({ e in e.id }).contains(message.chatId) {
+                    self.vm.getChat(id: message.chatId).disposed(by: self.disposeBag)
+                } else {
+                    if !self.users.map({ e in e.id }).contains(message.userId) {
+                        self.vm.getUser(id: message.userId).disposed(by: self.disposeBag)
+                    }
+                }
+                
+                self.messages.removeAll { e in
+                    e.id == message.id || e.chatId == message.chatId
+                }
+                self.messages.append(message)
+                self.messages.sort { o1, o2 in
+                    return o1.time > o2.time
+                }
+            }
+            self.tableView.reloadData()
+        })
     }
-    */
-
+    
+    func observeUsers() {
+        vm.user.bind(listener: { user in
+            guard let user = user else { return }
+            self.users.append(user)
+            self.tableView.reloadData()
+        })
+    }
+    
+    func observeChats() {
+        vm.chat.bind(listener: { chat in
+            guard let chat = chat else { return }
+            self.chats.append(chat)
+            if !self.chatLists.keys.contains(chat.id) {
+                self.vm.getChatList(id: chat.id).disposed(by: self.disposeBag)
+            }
+            self.tableView.reloadData()
+        })
+    }
+    
+    func observeChatList() {
+        vm.chatList.bind(listener: { dictionary in
+            guard let dictionary = dictionary else { return }
+            self.chatLists[dictionary.keys.first!] = dictionary.values.first!
+            self.users.removeAll { user in dictionary.values.first!.contains(user)}
+            self.users.append(contentsOf: dictionary.values.first!)
+            self.tableView.reloadData()
+        })
+    }
 }
 
 
-extension MainViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension MainViewController: UITableViewDataSource, UITableViewDelegate {
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return chats.count
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.messages.count
     }
+
+        func doLoad(for indexPath: IndexPath) -> Bool {
+            return indexPath.row >= messages.count - 1 && !vm.isLoading
+        }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ChatCell", for: indexPath) as! ChatCell
-        cell.label.text = chats[indexPath.item].value
-        cell.backgroundColor = .gray
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+
+        if (doLoad(for: indexPath)) {
+            vm.getMessages().disposed(by: disposeBag)
+        }
+        
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "ChatCell", for: indexPath) as? ChatCell  else {
+            fatalError(".")
+        }
+        
+        let item = self.messages[indexPath.row]
+        let id = UserDefaults.standard.integer(forKey: "USERID")
+        let users = self.chatLists[item.chatId]?.filter({ user -> Bool in user.id != id }) ?? []
+        
+        cell.title.text = self.chats
+            .first(where: { (chat: Chat) -> Bool in
+                chat.id == item.chatId
+            })?.title ?? users.map({ user in user.nickname })
+                .joined(separator: ", ")
+        
+        let user = users.first { user -> Bool in user.id == item.userId }
+        let from = (user == nil) ? "you" : "\(user!.name) \(user!.surname)"
+        let message = item.type != "media" ? item.data : "Send a photo"
+        cell.message.text = "\(from): \(message)"
+        
         return cell
     }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: UIScreen.main.bounds.width, height: 100)
-    }
-    
-    
-    
 }

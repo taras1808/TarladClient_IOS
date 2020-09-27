@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:Tarlad/Models/Message+CoreDataClass.swift">
+   </FileRef>
+   <FileRef
+      location = "group:Tarlad/Models/Message+CoreDataProperties.swift">
+   </FileRef>
+   <FileRef
       location = "group:Tarlad.xcodeproj">
    </FileRef>
    <FileRef

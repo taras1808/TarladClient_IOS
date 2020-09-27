@@ -6,6 +6,7 @@
 //  Copyright © 2020 Tarlad. All rights reserved.
 //
 
+
 struct LoginCreditentals: Encodable {
     let email: String?
     let password: String?

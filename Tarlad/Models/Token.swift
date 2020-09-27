@@ -6,6 +6,7 @@
 //  Copyright © 2020 Tarlad. All rights reserved.
 //
 
+
 struct Token: Codable {
     let value: String
     let userId: Int64

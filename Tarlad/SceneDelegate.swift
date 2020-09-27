@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import SocketIO
+import CoreData
 
 @available(iOS 13.0, *)
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -21,19 +23,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
 
-        let isAuthorized = UserDefaults.standard.string(forKey: "TOKEN") != nil
+        let token = UserDefaults.standard.string(forKey: "TOKEN")
         
-        if (!isAuthorized) {
+        
+        if (token == nil) {
             let mainStoryboard = UIStoryboard(name: "Main", bundle: nil)
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             self.window = UIWindow(frame: windowScene.coordinateSpace.bounds)
             appDelegate.window = window
-            let mainViewController = mainStoryboard.instantiateViewController(withIdentifier: "MainViewController")
+            let mainViewController = mainStoryboard.instantiateViewController(withIdentifier: "Start")
             window!.rootViewController = mainViewController
             window!.windowScene = windowScene
             window!.makeKeyAndVisible()
             mainViewController.performSegue(withIdentifier: "auth", sender: mainViewController)
             
+        } else {
+            SocketIO.shared.setToken(token: token!)
+            SocketIO.shared.socket.connect()
         }
     }
 
@@ -63,6 +69,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
+        
+        (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
     }
 
 

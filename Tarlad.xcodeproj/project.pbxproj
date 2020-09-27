@@ -10,8 +10,23 @@
 		62C279EC54B551BFE6397D20 /* Pods_Tarlad.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4731025B2C2AA491375CF4DC /* Pods_Tarlad.framework */; };
 		6412F8AB2515621400637C1A /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6412F8AA2515621400637C1A /* AuthViewModel.swift */; };
 		6412F8AD2515658F00637C1A /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6412F8AC2515658F00637C1A /* MainViewController.swift */; };
-		6412F8B12516878B00637C1A /* ChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6412F8AF2516878B00637C1A /* ChatCell.swift */; };
-		6412F8B22516878B00637C1A /* ChatCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6412F8B02516878B00637C1A /* ChatCell.xib */; };
+		6412F8B42517621D00637C1A /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6412F8B32517621D00637C1A /* ProfileViewController.swift */; };
+		6412F8B625176F1200637C1A /* Chat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6412F8B525176F1200637C1A /* Chat.swift */; };
+		6412F8B82517756D00637C1A /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6412F8B72517756D00637C1A /* User.swift */; };
+		6412F8BA2517771C00637C1A /* ChatList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6412F8B92517771C00637C1A /* ChatList.swift */; };
+		6412F8BC251779F900637C1A /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6412F8BB251779F900637C1A /* MainViewModel.swift */; };
+		6412F8BF2517861B00637C1A /* SocketIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6412F8BE2517861B00637C1A /* SocketIO.swift */; };
+		6412F8C12517A76300637C1A /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6412F8C02517A76300637C1A /* Message.swift */; };
+		647F77F2251D23C400CB82D6 /* UserRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647F77F1251D23C400CB82D6 /* UserRepo.swift */; };
+		647F77F6251D244200CB82D6 /* UserRepoImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647F77F5251D244200CB82D6 /* UserRepoImpl.swift */; };
+		647F77F8251D263900CB82D6 /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647F77F7251D263900CB82D6 /* Box.swift */; };
+		647F77FB251D2DC500CB82D6 /* ChatRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647F77FA251D2DC500CB82D6 /* ChatRepo.swift */; };
+		647F77FD251D2E2300CB82D6 /* ChatRepoImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647F77FC251D2E2300CB82D6 /* ChatRepoImpl.swift */; };
+		647F77FF251E6FD600CB82D6 /* MessageRepo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647F77FE251E6FD600CB82D6 /* MessageRepo.swift */; };
+		647F7801251E71BF00CB82D6 /* MessageRepoImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647F7800251E71BF00CB82D6 /* MessageRepoImpl.swift */; };
+		647F7803251EA13200CB82D6 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647F7802251EA13200CB82D6 /* Extensions.swift */; };
+		647F7805251EA1A200CB82D6 /* ChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647F7804251EA1A200CB82D6 /* ChatCell.swift */; };
+		647F7808251EA3C500CB82D6 /* Tarlad.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 647F7806251EA3C500CB82D6 /* Tarlad.xcdatamodeld */; };
 		64851859250FAD4800DE47BF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64851858250FAD4800DE47BF /* AppDelegate.swift */; };
 		6485185B250FAD4800DE47BF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6485185A250FAD4800DE47BF /* SceneDelegate.swift */; };
 		64851862250FAD4800DE47BF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 64851860250FAD4800DE47BF /* Main.storyboard */; };
@@ -27,8 +42,23 @@
 		4731025B2C2AA491375CF4DC /* Pods_Tarlad.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Tarlad.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6412F8AA2515621400637C1A /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		6412F8AC2515658F00637C1A /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
-		6412F8AF2516878B00637C1A /* ChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCell.swift; sourceTree = "<group>"; };
-		6412F8B02516878B00637C1A /* ChatCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChatCell.xib; sourceTree = "<group>"; };
+		6412F8B32517621D00637C1A /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		6412F8B525176F1200637C1A /* Chat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chat.swift; sourceTree = "<group>"; };
+		6412F8B72517756D00637C1A /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		6412F8B92517771C00637C1A /* ChatList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatList.swift; sourceTree = "<group>"; };
+		6412F8BB251779F900637C1A /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
+		6412F8BE2517861B00637C1A /* SocketIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketIO.swift; sourceTree = "<group>"; };
+		6412F8C02517A76300637C1A /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		647F77F1251D23C400CB82D6 /* UserRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRepo.swift; sourceTree = "<group>"; };
+		647F77F5251D244200CB82D6 /* UserRepoImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRepoImpl.swift; sourceTree = "<group>"; };
+		647F77F7251D263900CB82D6 /* Box.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Box.swift; sourceTree = "<group>"; };
+		647F77FA251D2DC500CB82D6 /* ChatRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRepo.swift; sourceTree = "<group>"; };
+		647F77FC251D2E2300CB82D6 /* ChatRepoImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRepoImpl.swift; sourceTree = "<group>"; };
+		647F77FE251E6FD600CB82D6 /* MessageRepo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageRepo.swift; sourceTree = "<group>"; };
+		647F7800251E71BF00CB82D6 /* MessageRepoImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageRepoImpl.swift; sourceTree = "<group>"; };
+		647F7802251EA13200CB82D6 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		647F7804251EA1A200CB82D6 /* ChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCell.swift; sourceTree = "<group>"; };
+		647F7807251EA3C500CB82D6 /* Tarlad.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Tarlad.xcdatamodel; sourceTree = "<group>"; };
 		64851855250FAD4800DE47BF /* Tarlad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tarlad.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64851858250FAD4800DE47BF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6485185A250FAD4800DE47BF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -73,19 +103,22 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		6412F8AE251686F100637C1A /* Cells */ = {
+		6412F8BD251785CC00637C1A /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
-				6412F8AF2516878B00637C1A /* ChatCell.swift */,
-				6412F8B02516878B00637C1A /* ChatCell.xib */,
+				647F77F4251D243200CB82D6 /* Impl */,
+				647F77F1251D23C400CB82D6 /* UserRepo.swift */,
+				647F77FA251D2DC500CB82D6 /* ChatRepo.swift */,
+				647F77FE251E6FD600CB82D6 /* MessageRepo.swift */,
 			);
-			path = Cells;
+			path = Repositories;
 			sourceTree = "<group>";
 		};
 		647E127425110A3000D451B1 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
 				6412F8AA2515621400637C1A /* AuthViewModel.swift */,
+				6412F8BB251779F900637C1A /* MainViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -95,8 +128,30 @@
 			children = (
 				6487661B250FC10C00FD272D /* AuthViewController.swift */,
 				6412F8AC2515658F00637C1A /* MainViewController.swift */,
+				6412F8B32517621D00637C1A /* ProfileViewController.swift */,
+				647F7804251EA1A200CB82D6 /* ChatCell.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		647F77F3251D23FD00CB82D6 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				6412F8BE2517861B00637C1A /* SocketIO.swift */,
+				647F77F7251D263900CB82D6 /* Box.swift */,
+				647F7802251EA13200CB82D6 /* Extensions.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		647F77F4251D243200CB82D6 /* Impl */ = {
+			isa = PBXGroup;
+			children = (
+				647F77F5251D244200CB82D6 /* UserRepoImpl.swift */,
+				647F77FC251D2E2300CB82D6 /* ChatRepoImpl.swift */,
+				647F7800251E71BF00CB82D6 /* MessageRepoImpl.swift */,
+			);
+			path = Impl;
 			sourceTree = "<group>";
 		};
 		6485184C250FAD4800DE47BF = {
@@ -120,7 +175,8 @@
 		64851857250FAD4800DE47BF /* Tarlad */ = {
 			isa = PBXGroup;
 			children = (
-				6412F8AE251686F100637C1A /* Cells */,
+				647F77F3251D23FD00CB82D6 /* Helpers */,
+				6412F8BD251785CC00637C1A /* Repositories */,
 				64AF202F251149E4008E34CC /* Models */,
 				647E127525110A4700D451B1 /* Views */,
 				647E127425110A3000D451B1 /* ViewModels */,
@@ -130,6 +186,7 @@
 				64851863250FAD4A00DE47BF /* Assets.xcassets */,
 				64851865250FAD4A00DE47BF /* LaunchScreen.storyboard */,
 				64851868250FAD4A00DE47BF /* Info.plist */,
+				647F7806251EA3C500CB82D6 /* Tarlad.xcdatamodeld */,
 			);
 			path = Tarlad;
 			sourceTree = "<group>";
@@ -140,6 +197,10 @@
 				64AF2030251149EF008E34CC /* TokenDTO.swift */,
 				64AF203225114A0D008E34CC /* LoginCreditentals.swift */,
 				64AF203425114AB4008E34CC /* Token.swift */,
+				6412F8B525176F1200637C1A /* Chat.swift */,
+				6412F8B72517756D00637C1A /* User.swift */,
+				6412F8B92517771C00637C1A /* ChatList.swift */,
+				6412F8C02517A76300637C1A /* Message.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -205,7 +266,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				64851867250FAD4A00DE47BF /* LaunchScreen.storyboard in Resources */,
-				6412F8B22516878B00637C1A /* ChatCell.xib in Resources */,
 				64851864250FAD4A00DE47BF /* Assets.xcassets in Resources */,
 				64851862250FAD4800DE47BF /* Main.storyboard in Resources */,
 			);
@@ -260,15 +320,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				647F7803251EA13200CB82D6 /* Extensions.swift in Sources */,
 				64851859250FAD4800DE47BF /* AppDelegate.swift in Sources */,
+				6412F8BA2517771C00637C1A /* ChatList.swift in Sources */,
 				64AF203525114AB4008E34CC /* Token.swift in Sources */,
-				6412F8B12516878B00637C1A /* ChatCell.swift in Sources */,
 				64AF203325114A0D008E34CC /* LoginCreditentals.swift in Sources */,
+				6412F8B625176F1200637C1A /* Chat.swift in Sources */,
+				647F7801251E71BF00CB82D6 /* MessageRepoImpl.swift in Sources */,
+				6412F8BC251779F900637C1A /* MainViewModel.swift in Sources */,
+				6412F8BF2517861B00637C1A /* SocketIO.swift in Sources */,
 				6485185B250FAD4800DE47BF /* SceneDelegate.swift in Sources */,
+				647F77F6251D244200CB82D6 /* UserRepoImpl.swift in Sources */,
+				647F77F8251D263900CB82D6 /* Box.swift in Sources */,
 				6412F8AB2515621400637C1A /* AuthViewModel.swift in Sources */,
 				64AF2031251149EF008E34CC /* TokenDTO.swift in Sources */,
+				6412F8B42517621D00637C1A /* ProfileViewController.swift in Sources */,
 				6412F8AD2515658F00637C1A /* MainViewController.swift in Sources */,
+				647F77FB251D2DC500CB82D6 /* ChatRepo.swift in Sources */,
+				647F7808251EA3C500CB82D6 /* Tarlad.xcdatamodeld in Sources */,
+				647F7805251EA1A200CB82D6 /* ChatCell.swift in Sources */,
+				647F77FF251E6FD600CB82D6 /* MessageRepo.swift in Sources */,
+				6412F8C12517A76300637C1A /* Message.swift in Sources */,
 				6487661C250FC10C00FD272D /* AuthViewController.swift in Sources */,
+				647F77FD251D2E2300CB82D6 /* ChatRepoImpl.swift in Sources */,
+				647F77F2251D23C400CB82D6 /* UserRepo.swift in Sources */,
+				6412F8B82517756D00637C1A /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -470,6 +546,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		647F7806251EA3C500CB82D6 /* Tarlad.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				647F7807251EA3C500CB82D6 /* Tarlad.xcdatamodel */,
+			);
+			currentVersion = 647F7807251EA3C500CB82D6 /* Tarlad.xcdatamodel */;
+			path = Tarlad.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 6485184D250FAD4800DE47BF /* Project object */;
 }
