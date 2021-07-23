@@ -26,30 +26,24 @@ class UserRepoImpl: UserRepo {
         return Observable.create { emitter in
             
             var cache: User? = nil
-            var cacheNS: NSManagedObject? = nil
             
             do {
-                let fetchRequest: NSFetchRequest<NSManagedObject> = NSFetchRequest(entityName: "User")
+                let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
                 fetchRequest.predicate = NSPredicate(format: "id == \(id)")
-                let objects = try self.managedContext.fetch(fetchRequest)
-                for item in objects {
-                    let user = User(item: item)
-                    cache = user
-                    cacheNS = item
-                }
+                cache = try self.managedContext.fetch(fetchRequest).first
+            
                 if let user = cache {
                     emitter.onNext(user)
                 }
             } catch let error as NSError {
                 print("Could not fetch. \(error), \(error.userInfo)")
             }
-        
-            // TODO
+            
             if SocketIO.shared.socket.status == .connected {
-                self.fetchUser(cache: cache, cacheNS: cacheNS, id: id, emitter: emitter)
+                self.fetchUser(cache: cache, id: id, emitter: emitter)
             } else {
                 SocketIO.shared.socket.once(clientEvent: .connect) { _, _ in
-                    self.fetchUser(cache: cache, cacheNS: cacheNS, id: id, emitter: emitter)
+                    self.fetchUser(cache: cache, id: id, emitter: emitter)
                 }
             }
             
@@ -57,7 +51,7 @@ class UserRepoImpl: UserRepo {
         }
     }
     
-    func fetchUser(cache: User?, cacheNS: NSManagedObject?, id: Int64, emitter: AnyObserver<User>) {
+    func fetchUser(cache: User?, id: Int64, emitter: AnyObserver<User>) {
         SocketIO.shared.socket.emitWithAck("users", with: [id])
             .timingOut(after: 0) { items in
                 if items.count == 0 { return }
@@ -65,27 +59,23 @@ class UserRepoImpl: UserRepo {
                     return
                 }
                 let item = items[0] as! [String: Any]
-                let user = User(item: item)
                 
+                var user = cache
                 
-                if user != cache {
-                
-                    let userEntity = NSEntityDescription.insertNewObject(forEntityName: "User", into: self.managedContext)
-                    user.setEntity(obj: userEntity)
-                    
-                    
-                    if let cacheNS = cacheNS {
-                        self.managedContext.delete(cacheNS)
-                    }
-                    
-                    do {
-                        try self.managedContext.save()
-                    } catch let error as NSError {
-                        print("Could not save. \(error), \(error.userInfo)")
-                    }
-                
-                    emitter.onNext(user)
+                if (cache?.id == item["id"] as? Int64) {
+                    cache?.setData(item: item)
+                } else {
+                    user = NSEntityDescription.insertNewObject(forEntityName: "User", into: self.managedContext) as? User
+                    user!.setData(item: item)
                 }
+                
+                do {
+                    try self.managedContext.save()
+                } catch let error as NSError {
+                    print("Could not save. \(error), \(error.userInfo)")
+                }
+
+                emitter.onNext(user!)
             }
     }
 

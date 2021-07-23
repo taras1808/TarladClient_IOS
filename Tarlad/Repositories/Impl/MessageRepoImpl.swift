@@ -2,7 +2,7 @@
 //  MessageRepoImpl.swift
 //  Tarlad
 //
-//  Created by Taras Kulyavets on 25.09.2020.
+//  Created by Taras Kulyavets on 05.10.2020.
 //  Copyright © 2020 Tarlad. All rights reserved.
 //
 
@@ -12,13 +12,16 @@ import CoreData
 import Foundation
 import UIKit
 
+
 public class MessageRepoImpl: MessageRepo {
-    
+
     public static let shared = MessageRepoImpl()
     
     public var addMessageListener: UUID? = nil
     public var updateMessageListener: UUID? = nil
     public var deleteMessageListener: UUID? = nil
+    
+    var time = Int64.max
     
     let managedContext: NSManagedObjectContext
     
@@ -27,152 +30,184 @@ public class MessageRepoImpl: MessageRepo {
         managedContext = appDelegate.persistentContainer.viewContext
     }
     
-    func getMessage(page: Int64, time: Int64) -> Observable<[Message]> {
-        
+    func getMessage(chatId: Int64) -> Observable<Set<Message>> {
         return Observable.create { emitter in
-            var cache: [Message] = []
-            
+            var cache: Set<Message> = []
             do {
                 let fetchRequest: NSFetchRequest<Message> = NSFetchRequest(entityName: "Message")
                 fetchRequest.fetchLimit = 10
-                fetchRequest.fetchOffset = Int(10 * page)
-                fetchRequest.predicate = NSPredicate(format: "time < \(time)")
+                fetchRequest.predicate = NSPredicate(format: "time < \(self.time) && chatId == \(chatId)")
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: "time", ascending: false)]
-                cache = try self.managedContext.fetch(fetchRequest)
+                cache = Set(try self.managedContext.fetch(fetchRequest))
                 if !cache.isEmpty {
                     emitter.onNext(cache)
                 }
+                
             } catch let error as NSError {
                 print("Could not fetch. \(error), \(error.userInfo)")
             }
             
             if SocketIO.shared.socket.status == .connected {
-                self.fetchMessages(cache: cache, time: time, page: page, emitter: emitter)
+                self.fetchMessages(cache: cache, chatId: chatId, time: self.time, emitter: emitter)
             } else {
                 SocketIO.shared.socket.once(clientEvent: .connect) { _, _ in
-                    self.fetchMessages(cache: cache, time: time, page: page, emitter: emitter)
+                    self.fetchMessages(cache: cache, chatId: chatId, time: self.time, emitter: emitter)
                 }
             }
+            
+            self.time = cache.max { o1, o2 in o1.time > o2.time }?.time ?? self.time
             
             return Disposables.create()
         }
     }
     
-    func fetchMessages(cache: [Message],time: Int64, page: Int64, emitter: AnyObserver<[Message]>) {
-        SocketIO.shared.socket.emitWithAck("chats/messages/last", with: [time, page])
+    func fetchMessages(cache: Set<Message>, chatId: Int64, time: Int64, emitter: AnyObserver<Set<Message>>) {
+        SocketIO.shared.socket.emitWithAck("chats/messages/before", with: [chatId, time])
             .timingOut(after: 0) { items in
                 if items.count == 0 { return }
                 if items[0] is String {
                     print(items)
                     return
                 }
-                    
-                var messages: [Message] = []
 
-//                for item in items[0] as! [[String: Any]] {
-//                    let message = Message()
-//                    messages.append(message)
-//                }
-                
-                if !messages.isEmpty && !messages.elementsEqual(cache) {
-                    
-//                    for message in messages {
-//                        let messageEntity = NSEntityDescription.insertNewObject(forEntityName: "Message", into: self.managedContext)
-//                        message.setEntity(obj: messageEntity)
-//                    }
-                    
-                    do {
-                        try self.managedContext.save()
-                    } catch let error as NSError {
-                        print("Could not save. \(error), \(error.userInfo)")
-                    }
-                
+                var messages: Set<Message> = []
+
+                for item in items[0] as! [[String: Any]] {
+                    let message = NSEntityDescription.insertNewObject(forEntityName: "Message", into: self.managedContext) as! Message
+                    message.setData(item: item)
+                    messages.insert(message)
+                }
+
+                cache.forEach { self.managedContext.delete($0) }
+
+                do {
+                    try self.managedContext.save()
+                } catch let error as NSError {
+                    print("Could not save. \(error), \(error.userInfo)")
+                }
+
+                if !messages.isEmpty {
+                    self.time = messages.max { o1, o2 in o1.time > o2.time }?.time ?? self.time
                     emitter.onNext(messages)
                 }
+
                 emitter.onCompleted()
             }
     }
     
-    func observeMessages() -> Observable<[Message]> {
-        
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { fatalError() }
-        let managedContext = appDelegate.persistentContainer.viewContext
+    func observeMessages(chatId: Int64) -> Observable<Set<Message>> {
         
         return Observable.create { emitter -> Disposable in
             
-            if let uuid = self.addMessageListener {
-                SocketIO.shared.socket.off(id: uuid)
-            }
-            self.addMessageListener = SocketIO.shared.socket.on("messages") { items, _ in
-                
+//            if let uuid = self.addMessageListener {
+//                SocketIO.shared.socket.off(id: uuid)
+//            }
+//            self.addMessageListener = SocketIO.shared.socket.on("messages") { items, _ in
 //                let item = items[0] as! [String: Any]
 //
-//                let message = Message(item: item)
-//                let messageEntity = NSEntityDescription.insertNewObject(forEntityName: "Message", into: self.managedContext)
-//                message.setEntity(obj: messageEntity)
+//                let message = NSEntityDescription.insertNewObject(forEntityName: "Message", into: self.managedContext) as! Message
+//                message.setData(item: item)
 //
 //                do {
-//                    try managedContext.save()
+//                    try self.managedContext.save()
 //                } catch let error as NSError {
 //                    print("Could not save. \(error), \(error.userInfo)")
 //                }
-                
+//
 //                emitter.onNext([message])
-            }
-            
-            if let uuid = self.updateMessageListener {
-                SocketIO.shared.socket.off(id: uuid)
-            }
-            self.updateMessageListener = SocketIO.shared.socket.on("messages/update") { items, _ in
-                let item = items[0] as! [String: Any]
-                
-                // TODO DELETE
-//                let message = Message(item: item)
-//                let messageEntity = NSEntityDescription.insertNewObject(forEntityName: "Message", into: self.managedContext)
-//                message.setEntity(obj: messageEntity)
+//            }
+//
+//            if let uuid = self.updateMessageListener {
+//                SocketIO.shared.socket.off(id: uuid)
+//            }
+//            self.updateMessageListener = SocketIO.shared.socket.on("messages/update") { items, _ in
+//                let item = items[0] as! [String: Any]
+//
+//                let fetchRequest: NSFetchRequest<Message> = NSFetchRequest(entityName: "Message")
+//                fetchRequest.predicate = NSPredicate(format: "id == \(item["id"] as! Int64)")
+//
+//                var message: Message?
 //
 //                do {
-//                    try managedContext.save()
+//
+//                    message = try self.managedContext.fetch(fetchRequest).first
+//
+//                    if message == nil {
+//                        message = (NSEntityDescription.insertNewObject(forEntityName: "Message", into: self.managedContext) as! Message)
+//                    }
+//
+//                    message!.setData(item: item)
+//
+//                    try self.managedContext.save()
 //                } catch let error as NSError {
 //                    print("Could not save. \(error), \(error.userInfo)")
 //                }
-                
-//                emitter.onNext([messsage])
-            }
-            
-            if let uuid = self.deleteMessageListener {
-                SocketIO.shared.socket.off(id: uuid)
-            }
-            self.deleteMessageListener = SocketIO.shared.socket.on("messages/delete") { items, _ in
-                //let item = items[0] as! Int64
-                //self.fetchLastMessageForChat(chatId: item, emitter: emitter)
-            }
+//
+//                emitter.onNext([message!])
+//            }
+//
+//            if let uuid = self.deleteMessageListener {
+//                SocketIO.shared.socket.off(id: uuid)
+//            }
+//            self.deleteMessageListener = SocketIO.shared.socket.on("messages/delete") { items, _ in
+//                let item = items[0] as! Int64
+//
+//
+//                let fetchRequest: NSFetchRequest<Message> = NSFetchRequest(entityName: "Message")
+//                fetchRequest.predicate = NSPredicate(format: "id == \(item)")
+//
+//                do {
+//
+//                    let message = try self.managedContext.fetch(fetchRequest).first
+//
+//                    if let message = message {
+//                        self.managedContext.delete(message)
+//                    }
+//
+//
+//                    try self.managedContext.save()
+//                } catch let error as NSError {
+//                    print("Could not save. \(error), \(error.userInfo)")
+//                }
+//
+//                self.fetchLastMessageForChat(chatId: item, emitter: emitter)
+//            }
             
             return Disposables.create()
         }
     }
     
-    func fetchLastMessageForChat(chatId: Int64, emitter: AnyObserver<[Message]>) {
+    func fetchLastMessageForChat(chatId: Int64, emitter: AnyObserver<Set<Message>>) {
         
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { fatalError() }
-        let managedContext = appDelegate.persistentContainer.viewContext
-        
-        SocketIO.shared.socket.emitWithAck("messages/last", with: [chatId]).timingOut(after: 0) { items in
-            if items.isEmpty {
-                return
-            }
-            
-            let item = items[0] as! [String: Any]
-            
-//            let message = Message(item: item)
-//
+//        SocketIO.shared.socket.emitWithAck("messages/last", with: [chatId]).timingOut(after: 0) { items in
+//            if items.isEmpty {
+//                return
+//            }
+//            
+//            let item = items[0] as! [String: Any]
+//            
+//            let fetchRequest: NSFetchRequest<Message> = NSFetchRequest(entityName: "Message")
+//            fetchRequest.predicate = NSPredicate(format: "id == \(item["id"] as! Int64)")
+//            
+//            
+//            
 //            do {
-//                try managedContext.save()
+//                
+//                var message = try self.managedContext.fetch(fetchRequest).first
+//                
+//                if message == nil {
+//                    message = (NSEntityDescription.insertNewObject(forEntityName: "Message", into: self.managedContext) as! Message)
+//                }
+//                
+//                message!.setData(item: item)
+//                
+//                try self.managedContext.save()
+//                
+//                emitter.onNext([message!])
+//                
 //            } catch let error as NSError {
 //                print("Could not save. \(error), \(error.userInfo)")
 //            }
-//
-//            emitter.onNext([message])
-        }
+//        }
     }
 }

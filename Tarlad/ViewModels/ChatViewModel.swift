@@ -1,36 +1,34 @@
 //
-//  MainViewModel.swift
+//  ChatViewModel.swift
 //  Tarlad
 //
-//  Created by Taras Kulyavets on 20.09.2020.
+//  Created by Taras Kulyavets on 05.10.2020.
 //  Copyright © 2020 Tarlad. All rights reserved.
 //
 
 import Foundation
 import RxSwift
 
-class MainViewModel {
+class ChatViewModel {
     
     let messages = Box<Set<Message>>([])
     let user = Box<User?>(nil)
     let chat = Box<Chat?>(nil)
-    let chatList = Box<[Int64: Set<User>]?>(nil)
+    
+    init() {
+        messageRepo.time = Int64.max
+    }
     
     var isLoading = false
     
-    
-    var time = Int64(Date().timeIntervalSince1970 * 1000)
-    var page: Int64 = 0
-    
     let userRepo: UserRepo = UserRepoImpl.shared
     let chatRepo: ChatRepo = ChatRepoImpl.shared
-    let mainRepo: MainRepo = MainRepoImpl.shared
+    var messageRepo: MessageRepo = MessageRepoImpl.shared
     
-    func getMessages() -> Disposable {
-        return mainRepo.getMessage(page: page, time: time)
+    func getMessages(chatId: Int64) -> Disposable {
+        return messageRepo.getMessage(chatId: chatId)
             .do(onSubscribe: {
                 self.isLoading = true
-                self.page += 1
             })
             .subscribe(onNext: { result in
                 self.isLoading = false
@@ -38,8 +36,8 @@ class MainViewModel {
             })
     }
     
-    func observeMessages() -> Disposable {
-        return mainRepo.observeMessages()
+    func observeMessages(chatId: Int64) -> Disposable {
+        return messageRepo.observeMessages(chatId: chatId)
             .subscribe(onNext: { result in
                 self.messages.value = result
             })
@@ -58,13 +56,4 @@ class MainViewModel {
                 self.chat.value = result
             })
     }
-    
-    func getChatList(id: Int64) -> Disposable {
-        return chatRepo.getChatList(id: id)
-            .subscribe(onNext: { result in
-                self.chatList.value = [id: result]
-            })
-    }
-    
-    
 }

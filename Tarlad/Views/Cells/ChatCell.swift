@@ -9,6 +9,8 @@
 import UIKit
 
 class ChatCell: UITableViewCell {
+    
+    var chatId: Int64?
 
     @IBOutlet weak var chatImage: UIImageView! {
         didSet {

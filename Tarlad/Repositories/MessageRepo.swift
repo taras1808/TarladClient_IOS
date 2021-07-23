@@ -2,7 +2,7 @@
 //  MessageRepo.swift
 //  Tarlad
 //
-//  Created by Taras Kulyavets on 25.09.2020.
+//  Created by Taras Kulyavets on 05.10.2020.
 //  Copyright © 2020 Tarlad. All rights reserved.
 //
 
@@ -11,8 +11,10 @@ import RxSwift
 
 protocol MessageRepo {
     
-    func getMessage(page: Int64, time: Int64) -> Observable<[Message]>
+    var time: Int64 { get set }
     
-    func observeMessages() -> Observable<[Message]>
+    func getMessage(chatId: Int64) -> Observable<Set<Message>>
+    
+    func observeMessages(chatId: Int64) -> Observable<Set<Message>>
     
 }

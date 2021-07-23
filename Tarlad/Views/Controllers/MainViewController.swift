@@ -24,6 +24,9 @@ class MainViewController: UIViewController {
     
     let vm = MainViewModel()
     
+    
+    var cell: ChatCell?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -32,14 +35,15 @@ class MainViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        observeMessages()
+        
         observeUsers()
-        observeChats()
         observeChatList()
+        observeChats()
+        observeMessages()
         
         vm.observeMessages().disposed(by: disposeBag)
         
-        vm.getMessages().disposed(by: self.disposeBag)
+        vm.getMessages().disposed(by: disposeBag)
     }
     
     @IBAction func unwindToMain(unwindSegue: UIStoryboardSegue) {
@@ -67,7 +71,7 @@ class MainViewController: UIViewController {
                 }
                 
                 self.messages.removeAll { e in
-                    e.id == message.id || e.chatId == message.chatId
+                    e.id == message.id || e.chatId == message.chatId || e.managedObjectContext == nil
                 }
                 self.messages.append(message)
                 self.messages.sort { o1, o2 in
@@ -81,6 +85,7 @@ class MainViewController: UIViewController {
     func observeUsers() {
         vm.user.bind(listener: { user in
             guard let user = user else { return }
+            self.users.removeAll { $0.id == user.id }
             self.users.append(user)
             self.tableView.reloadData()
         })
@@ -106,10 +111,22 @@ class MainViewController: UIViewController {
             self.tableView.reloadData()
         })
     }
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showMessages" {
+
+            let chatViewController = segue.destination as! ChatViewController
+            
+            if let cell = cell {
+                chatViewController.chatId = cell.chatId
+            }
+        }
+    }
 }
 
 
-extension MainViewController: UITableViewDataSource, UITableViewDelegate {
+extension MainViewController: UITableViewDataSource, UITableViewDelegate, UIGestureRecognizerDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -137,6 +154,7 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
         let id = UserDefaults.standard.integer(forKey: "USERID")
         let users = self.chatLists[item.chatId]?.filter({ user -> Bool in user.id != id }) ?? []
         
+        cell.chatId = item.chatId
         cell.title.text = self.chats
             .first(where: { (chat: Chat) -> Bool in
                 chat.id == item.chatId
@@ -147,7 +165,34 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
         let from = (user == nil) ? "you" : "\(user!.name) \(user!.surname)"
         let message = item.type != "media" ? item.data : "Send a photo"
         cell.message.text = "\(from): \(message)"
-        
+
+        let touchDown = UILongPressGestureRecognizer(target: self, action: #selector(didTouchDown))
+        touchDown.minimumPressDuration = 0
+        cell.addGestureRecognizer(touchDown)
+
         return cell
     }
+    
+    @objc func didTouchDown(gesture: UILongPressGestureRecognizer) {
+        guard let cell = gesture.view as? ChatCell else { return }
+        switch gesture.state {
+            case .began:
+                cell.setHighlighted(true, animated: false)
+                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500), execute: {
+                    cell.setHighlighted(false, animated: false)
+                    cell.gestureRecognizers?.forEach { e in
+                        e.isEnabled = false
+                        e.isEnabled = true
+                    }
+                })
+                break
+            case .ended:
+                self.cell = cell
+                performSegue(withIdentifier: "showMessages", sender: self)
+                break
+            default:
+                break
+        }
+    }
+    
 }

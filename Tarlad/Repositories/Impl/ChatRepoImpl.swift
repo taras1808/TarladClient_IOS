@@ -25,17 +25,11 @@ class ChatRepoImpl: ChatRepo {
         return Observable.create { emitter in
             
             var cache: Chat? = nil
-            var cacheNS: NSManagedObject? = nil
             
             do {
-                let fetchRequest: NSFetchRequest<NSManagedObject> = NSFetchRequest(entityName: "Chat")
+                let fetchRequest: NSFetchRequest<Chat> = Chat.fetchRequest()
                 fetchRequest.predicate = NSPredicate(format: "id == \(id)")
-                let objects = try self.managedContext.fetch(fetchRequest)
-                for item in objects {
-                    let chat = Chat(item: item)
-                    cache = chat
-                    cacheNS = item
-                }
+                cache = try self.managedContext.fetch(fetchRequest).first
                 if let chat = cache {
                     emitter.onNext(chat)
                 }
@@ -44,10 +38,10 @@ class ChatRepoImpl: ChatRepo {
             }
             
             if SocketIO.shared.socket.status == .connected {
-                self.fetchChat(cache: cache, cacheNS: cacheNS, id: id, emitter: emitter)
+                self.fetchChat(cache: cache, id: id, emitter: emitter)
             } else {
                 SocketIO.shared.socket.once(clientEvent: .connect) { _, _ in
-                    self.fetchChat(cache: cache, cacheNS: cacheNS, id: id, emitter: emitter)
+                    self.fetchChat(cache: cache, id: id, emitter: emitter)
                 }
             }
             
@@ -55,7 +49,7 @@ class ChatRepoImpl: ChatRepo {
         }
     }
     
-    func fetchChat(cache: Chat?, cacheNS: NSManagedObject?, id: Int64, emitter: AnyObserver<Chat>) {
+    func fetchChat(cache: Chat?, id: Int64, emitter: AnyObserver<Chat>) {
         SocketIO.shared.socket.emitWithAck("chats", with: [id])
             .timingOut(after: 0) { items in
                 if items.count == 0 { return }
@@ -63,63 +57,53 @@ class ChatRepoImpl: ChatRepo {
                     return
                 }
                 let item = items[0] as! [String: Any]
-                let chat = Chat(item: item)
                 
                 
-                if chat != cache {
-                
-                    let chatEntity = NSEntityDescription.insertNewObject(forEntityName: "Chat", into: self.managedContext)
-                    chat.setEntity(obj: chatEntity)
-                    
-                    if let cacheNS = cacheNS {
-                        self.managedContext.delete(cacheNS)
-                    }
-                    
-                    do {
-                        try self.managedContext.save()
-                    } catch let error as NSError {
-                        print("Could not save. \(error), \(error.userInfo)")
-                    }
-                
-                    emitter.onNext(chat)
+                let chat = NSEntityDescription.insertNewObject(forEntityName: "Chat", into: self.managedContext) as! Chat
+                chat.setData(item: item)
+
+                if let cache = cache {
+                    self.managedContext.delete(cache)
                 }
+
+                do {
+                    try self.managedContext.save()
+                } catch let error as NSError {
+                    print("Could not save. \(error), \(error.userInfo)")
+                }
+
+                emitter.onNext(chat)
             }
     }
     
     func getChatList(id: Int64) -> Observable<Set<User>> {
         return Observable.create { emitter in
             
-            var cache: Set<User> = []
-            var cacheNS: NSManagedObject? = nil
+            var cache: Chat? = nil
             
             do {
-                let fetchRequest: NSFetchRequest<NSManagedObject> = NSFetchRequest(entityName: "Chat")
+                let fetchRequest: NSFetchRequest<Chat> = Chat.fetchRequest()
                 fetchRequest.predicate = NSPredicate(format: "id == \(id)")
-                let objects = try self.managedContext.fetch(fetchRequest)
-                for item in objects {
-                    let chat = Chat(item: item)
-                    cache = chat.users
-                    cacheNS = item
-                }
-                if !cache.isEmpty {
-                    emitter.onNext(cache)
+                cache = try self.managedContext.fetch(fetchRequest).first
+                if let cache = cache, !(cache.users as! Set<User>).isEmpty {
+                    emitter.onNext(cache.users as! Set<User>)
                 }
             } catch let error as NSError {
                 print("Could not fetch. \(error), \(error.userInfo)")
             }
             
             if SocketIO.shared.socket.status == .connected {
-                self.fetchChatList(cache: cache, cacheNS: cacheNS, id: id, emitter: emitter)
+                self.fetchChatList(cache: cache, id: id, emitter: emitter)
             } else {
                 SocketIO.shared.socket.once(clientEvent: .connect) { _, _ in
-                    self.fetchChatList(cache: cache, cacheNS: cacheNS, id: id, emitter: emitter)
+                    self.fetchChatList(cache: cache, id: id, emitter: emitter)
                 }
             }
             return Disposables.create()
         }
     }
     
-    func fetchChatList(cache: Set<User>, cacheNS: NSManagedObject?, id: Int64, emitter: AnyObserver<Set<User>>) {
+    func fetchChatList(cache: Chat?, id: Int64, emitter: AnyObserver<Set<User>>) {
         SocketIO.shared.socket.emitWithAck("chats/users", with: [id])
             .timingOut(after: 0) { items in
                 if items.count == 0 { return }
@@ -127,20 +111,17 @@ class ChatRepoImpl: ChatRepo {
                     return
                 }
                 var users: Set<User> = []
-                var usersNS: Set<NSManagedObject> = []
                 for item in items[0] as! [[String: Any]] {
-                    let user = User(item: item)
-                    // TODO DELETE
-                    let userEntity = NSEntityDescription.insertNewObject(forEntityName: "User", into: self.managedContext)
-                    user.setEntity(obj: userEntity)
+                    let user = NSEntityDescription.insertNewObject(forEntityName: "User", into: self.managedContext) as! User
+                    user.setData(item: item)
                     users.insert(user)
-                    usersNS.insert(userEntity)
                 }
                 
-                if cache != users {
-                    if let cacheNS = cacheNS {
-                        cacheNS.setValue(usersNS, forKey: "users")
-                    }
+                if cache?.users as? Set<User> != users {
+                    
+                    
+                    cache?.removeFromUsers(cache?.users ?? [])
+                    cache?.addToUsers(users as NSSet)
                     
                     do {
                         try self.managedContext.save()

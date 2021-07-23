@@ -24,7 +24,6 @@ class AuthViewController: UIViewController {
     }
     
     @IBAction func unwindToLogin(unwindSegue: UIStoryboardSegue) {
-        
     }
     
     @IBAction func login(_ sender: Any) {
@@ -35,7 +34,7 @@ class AuthViewController: UIViewController {
         )
         
         
-        AF.request("http://192.168.0.108:3000/api/accounts/authorize",
+        AF.request("http://192.168.1.116:3000/api/accounts/authorize",
            method: .post,
            parameters: login,
            encoder: JSONParameterEncoder.default).response { response in

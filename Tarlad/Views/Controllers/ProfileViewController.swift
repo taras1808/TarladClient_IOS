@@ -28,16 +28,15 @@ class ProfileViewController: UIViewController {
         navigationItem.setRightBarButtonItems([logout], animated: false)
     }
     
-    @IBAction func unwindToProfile(unwindSegue: UIStoryboardSegue) {
-        
-    }
-    
     @objc func logout(_ sender: UIButton) {
 
         UserDefaults.standard.removeObject(forKey: "USERID")
         UserDefaults.standard.removeObject(forKey: "TOKEN")
         SocketIO.shared.socket.disconnect()
-        performSegue(withIdentifier: "auth", sender: self)
+        
+        view.window?.rootViewController?.performSegue(withIdentifier: "authAnimated", sender: self)
+
+        
         let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
         let persistentContainer = appDelegate.persistentContainer
         let context = persistentContainer.viewContext
@@ -45,7 +44,6 @@ class ProfileViewController: UIViewController {
         entityNames.forEach { entityName in
             let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
             let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
-
             do {
                 try context.execute(deleteRequest)
                 try context.save()
