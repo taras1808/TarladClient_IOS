@@ -11,5 +11,5 @@ import RxSwift
 
 protocol UserRepo {
     
-    func getUser(id: Int64) -> Observable<User>
+    func getUser(id: Int) -> Observable<User>
 }

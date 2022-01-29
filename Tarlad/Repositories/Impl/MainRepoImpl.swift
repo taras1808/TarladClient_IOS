@@ -28,7 +28,7 @@ public class MainRepoImpl: MainRepo {
         managedContext = appDelegate.persistentContainer.viewContext
     }
     
-    func getMessage(page: Int64, time: Int64) -> Observable<Set<Message>> {
+    func getMessage(page: Int, time: Int) -> Observable<Set<Message>> {
         
         return Observable.create { emitter in
             var cache: Set<Message> = []
@@ -76,8 +76,8 @@ public class MainRepoImpl: MainRepo {
         }
     }
     
-    func fetchMessages(cache: Set<Message>, time: Int64, page: Int64, emitter: AnyObserver<Set<Message>>) {
-        SocketIO.shared.socket.emitWithAck("chats/messages/last", with: [time, page])
+    func fetchMessages(cache: Set<Message>, time: Int, page: Int, emitter: AnyObserver<Set<Message>>) {
+        SocketIO.shared.socket.emitWithAck("chats/messages/last", time, page)
             .timingOut(after: 0) { items in
                 if items.count == 0 { return }
                 if items[0] is String {
@@ -164,7 +164,7 @@ public class MainRepoImpl: MainRepo {
                 SocketIO.shared.socket.off(id: uuid)
             }
             self.deleteMessageListener = SocketIO.shared.socket.on("messages/delete") { items, _ in
-                let item = items[0] as! Int64
+                let item = items[0] as! Int
                 
                 
                 let fetchRequest: NSFetchRequest<Message> = NSFetchRequest(entityName: "Message")
@@ -191,9 +191,9 @@ public class MainRepoImpl: MainRepo {
         }
     }
     
-    func fetchLastMessageForChat(chatId: Int64, emitter: AnyObserver<Set<Message>>) {
+    func fetchLastMessageForChat(chatId: Int, emitter: AnyObserver<Set<Message>>) {
         
-        SocketIO.shared.socket.emitWithAck("messages/last", with: [chatId]).timingOut(after: 0) { items in
+        SocketIO.shared.socket.emitWithAck("messages/last", chatId).timingOut(after: 0) { items in
             if items.isEmpty {
                 return
             }

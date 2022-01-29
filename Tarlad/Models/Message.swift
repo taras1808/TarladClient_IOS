@@ -16,23 +16,23 @@ public class Message: NSManagedObject {
         return NSFetchRequest<Message>(entityName: "Message")
     }
 
-    @NSManaged public var chatId: Int64
+    @NSManaged public var chatId: Int
     @NSManaged public var data: String
-    @NSManaged public var id: Int64
-    @NSManaged public var time: Int64
+    @NSManaged public var id: Int
+    @NSManaged public var time: Int
     @NSManaged public var type: String
-    @NSManaged public var userId: Int64
+    @NSManaged public var userId: Int
     
     public func setData(item: [String: Any]) {
-        id = item["id"] as! Int64
-        userId = item["user_id"] as! Int64
-        chatId = item["chat_id"] as! Int64
+        id = item["id"] as! Int
+        userId = item["user_id"] as! Int
+        chatId = item["chat_id"] as! Int
         type = item["type"] as! String
         data = item["data"] as! String
-        time = item["time"] as! Int64
+        time = item["time"] as! Int
     }
     
-    public class func getId(item: [String: Any]) -> Int64 {
-        return item["id"] as! Int64
+    public class func getId(item: [String: Any]) -> Int {
+        return item["id"] as! Int
     }
 }

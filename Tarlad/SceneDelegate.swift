@@ -39,7 +39,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             
         } else {
             SocketIO.shared.setToken(token: token!)
-            //SocketIO.shared.socket.connect()
+            SocketIO.shared.socket.connect()
         }
     }
 

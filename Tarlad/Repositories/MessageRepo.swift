@@ -11,10 +11,10 @@ import RxSwift
 
 protocol MessageRepo {
     
-    var time: Int64 { get set }
+    var time: Int { get set }
     
-    func getMessage(chatId: Int64) -> Observable<Set<Message>>
+    func getMessage(chatId: Int) -> Observable<Set<Message>>
     
-    func observeMessages(chatId: Int64) -> Observable<Set<Message>>
+    func observeMessages(chatId: Int) -> Observable<Set<Message>>
     
 }

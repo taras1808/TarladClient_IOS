@@ -16,12 +16,12 @@ class SocketIO {
     public var socket: SocketIOClient
     
     init() {
-        manager = SocketManager(socketURL: URL(string:"http://192.168.1.116:3000/")!, config: [.reconnects(true), .reconnectWait(1), .reconnectWaitMax(5)])
+        manager = SocketManager(socketURL: URL(string:"http://192.168.0.108:3000/")!, config: [.reconnects(true), .reconnectWait(1), .reconnectWaitMax(5)])
         socket = manager.defaultSocket
     }
     
     func setToken(token: String) {
-        manager = SocketManager(socketURL: URL(string:"http://192.168.1.116:3000/")!, config: [.reconnects(true), .reconnectWait(1), .reconnectWaitMax(5), .extraHeaders(["Authorization": "Bearer \(token)"])])
+        manager = SocketManager(socketURL: URL(string:"http://192.168.0.108:3000/")!, config: [.reconnects(true), .reconnectWait(1), .reconnectWaitMax(5), .extraHeaders(["Authorization": "Bearer \(token)"])])
         socket = manager.defaultSocket
         
         socket.on(clientEvent: .connect, callback: { _, _ in

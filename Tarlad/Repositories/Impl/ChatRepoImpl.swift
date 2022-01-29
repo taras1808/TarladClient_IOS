@@ -21,7 +21,7 @@ class ChatRepoImpl: ChatRepo {
         managedContext = appDelegate.persistentContainer.viewContext
     }
     
-    func getChat(id: Int64) -> Observable<Chat> {
+    func getChat(id: Int) -> Observable<Chat> {
         return Observable.create { emitter in
             
             var cache: Chat? = nil
@@ -49,8 +49,8 @@ class ChatRepoImpl: ChatRepo {
         }
     }
     
-    func fetchChat(cache: Chat?, id: Int64, emitter: AnyObserver<Chat>) {
-        SocketIO.shared.socket.emitWithAck("chats", with: [id])
+    func fetchChat(cache: Chat?, id: Int, emitter: AnyObserver<Chat>) {
+        SocketIO.shared.socket.emitWithAck("chats", id)
             .timingOut(after: 0) { items in
                 if items.count == 0 { return }
                 if items[0] is String {
@@ -76,7 +76,7 @@ class ChatRepoImpl: ChatRepo {
             }
     }
     
-    func getChatList(id: Int64) -> Observable<Set<User>> {
+    func getChatList(id: Int) -> Observable<Set<User>> {
         return Observable.create { emitter in
             
             var cache: Chat? = nil
@@ -103,8 +103,8 @@ class ChatRepoImpl: ChatRepo {
         }
     }
     
-    func fetchChatList(cache: Chat?, id: Int64, emitter: AnyObserver<Set<User>>) {
-        SocketIO.shared.socket.emitWithAck("chats/users", with: [id])
+    func fetchChatList(cache: Chat?, id: Int, emitter: AnyObserver<Set<User>>) {
+        SocketIO.shared.socket.emitWithAck("chats/users", id)
             .timingOut(after: 0) { items in
                 if items.count == 0 { return }
                 if items[0] is String {

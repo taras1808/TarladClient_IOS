@@ -21,7 +21,7 @@ public class MessageRepoImpl: MessageRepo {
     public var updateMessageListener: UUID? = nil
     public var deleteMessageListener: UUID? = nil
     
-    var time = Int64.max
+    var time = Int.max
     
     let managedContext: NSManagedObjectContext
     
@@ -30,7 +30,7 @@ public class MessageRepoImpl: MessageRepo {
         managedContext = appDelegate.persistentContainer.viewContext
     }
     
-    func getMessage(chatId: Int64) -> Observable<Set<Message>> {
+    func getMessage(chatId: Int) -> Observable<Set<Message>> {
         return Observable.create { emitter in
             var cache: Set<Message> = []
             do {
@@ -61,8 +61,9 @@ public class MessageRepoImpl: MessageRepo {
         }
     }
     
-    func fetchMessages(cache: Set<Message>, chatId: Int64, time: Int64, emitter: AnyObserver<Set<Message>>) {
-        SocketIO.shared.socket.emitWithAck("chats/messages/before", with: [chatId, time])
+    func fetchMessages(cache: Set<Message>, chatId: Int, time: Int, emitter: AnyObserver<Set<Message>>) {
+        SocketIO.shared.socket
+            .emitWithAck("chats/messages/before", chatId, time)
             .timingOut(after: 0) { items in
                 if items.count == 0 { return }
                 if items[0] is String {
@@ -95,7 +96,7 @@ public class MessageRepoImpl: MessageRepo {
             }
     }
     
-    func observeMessages(chatId: Int64) -> Observable<Set<Message>> {
+    func observeMessages(chatId: Int) -> Observable<Set<Message>> {
         
         return Observable.create { emitter -> Disposable in
             
@@ -177,7 +178,7 @@ public class MessageRepoImpl: MessageRepo {
         }
     }
     
-    func fetchLastMessageForChat(chatId: Int64, emitter: AnyObserver<Set<Message>>) {
+    func fetchLastMessageForChat(chatId: Int, emitter: AnyObserver<Set<Message>>) {
         
 //        SocketIO.shared.socket.emitWithAck("messages/last", with: [chatId]).timingOut(after: 0) { items in
 //            if items.isEmpty {

@@ -14,13 +14,13 @@ class MainViewModel {
     let messages = Box<Set<Message>>([])
     let user = Box<User?>(nil)
     let chat = Box<Chat?>(nil)
-    let chatList = Box<[Int64: Set<User>]?>(nil)
+    let chatList = Box<[Int: Set<User>]?>(nil)
     
     var isLoading = false
     
     
-    var time = Int64(Date().timeIntervalSince1970 * 1000)
-    var page: Int64 = 0
+    var time = Int(Date().timeIntervalSince1970 * 1000)
+    var page: Int = 0
     
     let userRepo: UserRepo = UserRepoImpl.shared
     let chatRepo: ChatRepo = ChatRepoImpl.shared
@@ -45,21 +45,21 @@ class MainViewModel {
             })
     }
     
-    func getUser(id: Int64) -> Disposable {
+    func getUser(id: Int) -> Disposable {
         return userRepo.getUser(id: id)
             .subscribe(onNext: { result in
                 self.user.value = result
             })
     }
     
-    func getChat(id: Int64) -> Disposable {
+    func getChat(id: Int) -> Disposable {
         return chatRepo.getChat(id: id)
             .subscribe(onNext: { result in
                 self.chat.value = result
             })
     }
     
-    func getChatList(id: Int64) -> Disposable {
+    func getChatList(id: Int) -> Disposable {
         return chatRepo.getChatList(id: id)
             .subscribe(onNext: { result in
                 self.chatList.value = [id: result]

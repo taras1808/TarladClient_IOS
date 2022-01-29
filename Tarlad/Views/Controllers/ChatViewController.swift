@@ -12,7 +12,7 @@ import RxSwift
 
 class ChatViewController: UIViewController {
     
-    var chatId: Int64?
+    var chatId: Int?
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var textView: UITextView!
@@ -63,11 +63,13 @@ class ChatViewController: UIViewController {
 
         tableView.delegate = self
         tableView.dataSource = self
+//        tableView.transform = CGAffineTransform(scaleX: 1, y: -1)
         
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 44
-        //tableView.transform = CGAffineTransform(rotationAngle: -.pi)
-        //tableView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.size.width - 8)
+//        tableView.transform = CGAffineTransform(rotationAngle: -.pi)
+//        tableView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.size.width - 8)
+        
         
         observeMessages()
         observeUsers()
@@ -102,9 +104,7 @@ class ChatViewController: UIViewController {
     func observeMessages() {
         vm.messages.bind(listener: { messages in
             if messages.count == 0 {
-                self.tableView.reloadData()
                 return
-                
             }
             for message in messages {
 
@@ -201,7 +201,7 @@ extension ChatViewController: UITableViewDataSource, UITableViewDelegate {
         cell.nickname.text = user?.nickname
         cell.message.text = "\(item.data)"
         
-        //cell.transform = CGAffineTransform(rotationAngle: .pi);
+//        cell.transform = CGAffineTransform(rotationAngle: .pi);
 
         return cell
     }

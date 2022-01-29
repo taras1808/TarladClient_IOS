@@ -16,20 +16,20 @@ public class Chat: NSManagedObject {
         return NSFetchRequest<Chat>(entityName: "Chat")
     }
     
-    @NSManaged public var id: Int64
+    @NSManaged public var id: Int
     @NSManaged public var title: String?
-    @NSManaged public var userId: Int64
+    @NSManaged public var userId: Int
     
     @NSManaged public var users: NSSet
     
     public func setData(item: [String: Any]) {
-        id = item["id"] as! Int64
+        id = item["id"] as! Int
         title = item["title"] as? String
-        userId = item["user_id"] as! Int64
+        userId = item["user_id"] as! Int
     }
     
-    public class func getId(item: [String: Any]) -> Int64 {
-        return item["id"] as! Int64
+    public class func getId(item: [String: Any]) -> Int {
+        return item["id"] as! Int
     }
     
     @objc(addUsersObject:)

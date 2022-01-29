@@ -11,7 +11,7 @@ import RxSwift
 
 protocol ChatRepo {
     
-    func getChat(id: Int64) -> Observable<Chat>
+    func getChat(id: Int) -> Observable<Chat>
     
-    func getChatList(id: Int64) -> Observable<Set<User>>
+    func getChatList(id: Int) -> Observable<Set<User>>
 }

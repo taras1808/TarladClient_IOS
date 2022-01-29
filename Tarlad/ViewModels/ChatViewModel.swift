@@ -16,7 +16,7 @@ class ChatViewModel {
     let chat = Box<Chat?>(nil)
     
     init() {
-        messageRepo.time = Int64.max
+        messageRepo.time = Int.max
     }
     
     var isLoading = false
@@ -25,7 +25,7 @@ class ChatViewModel {
     let chatRepo: ChatRepo = ChatRepoImpl.shared
     var messageRepo: MessageRepo = MessageRepoImpl.shared
     
-    func getMessages(chatId: Int64) -> Disposable {
+    func getMessages(chatId: Int) -> Disposable {
         return messageRepo.getMessage(chatId: chatId)
             .do(onSubscribe: {
                 self.isLoading = true
@@ -36,21 +36,21 @@ class ChatViewModel {
             })
     }
     
-    func observeMessages(chatId: Int64) -> Disposable {
+    func observeMessages(chatId: Int) -> Disposable {
         return messageRepo.observeMessages(chatId: chatId)
             .subscribe(onNext: { result in
                 self.messages.value = result
             })
     }
     
-    func getUser(id: Int64) -> Disposable {
+    func getUser(id: Int) -> Disposable {
         return userRepo.getUser(id: id)
             .subscribe(onNext: { result in
                 self.user.value = result
             })
     }
     
-    func getChat(id: Int64) -> Disposable {
+    func getChat(id: Int) -> Disposable {
         return chatRepo.getChat(id: id)
             .subscribe(onNext: { result in
                 self.chat.value = result

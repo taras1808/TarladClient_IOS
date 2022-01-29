@@ -21,7 +21,7 @@ class UserRepoImpl: UserRepo {
         managedContext = appDelegate.persistentContainer.viewContext
     }
     
-    func getUser(id: Int64) -> Observable<User> {
+    func getUser(id: Int) -> Observable<User> {
         
         return Observable.create { emitter in
             
@@ -51,8 +51,8 @@ class UserRepoImpl: UserRepo {
         }
     }
     
-    func fetchUser(cache: User?, id: Int64, emitter: AnyObserver<User>) {
-        SocketIO.shared.socket.emitWithAck("users", with: [id])
+    func fetchUser(cache: User?, id: Int, emitter: AnyObserver<User>) {
+        SocketIO.shared.socket.emitWithAck("users", id)
             .timingOut(after: 0) { items in
                 if items.count == 0 { return }
                 if items[0] is String {
@@ -62,7 +62,7 @@ class UserRepoImpl: UserRepo {
                 
                 var user = cache
                 
-                if (cache?.id == item["id"] as? Int64) {
+                if (cache?.id == item["id"] as? Int) {
                     cache?.setData(item: item)
                 } else {
                     user = NSEntityDescription.insertNewObject(forEntityName: "User", into: self.managedContext) as? User

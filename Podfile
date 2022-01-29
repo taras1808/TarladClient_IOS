@@ -7,7 +7,7 @@ target 'Tarlad' do
 
   # Pods for Tarlad
 
-	pod 'Socket.IO-Client-Swift', '~> 15.2.0'
+	pod 'Socket.IO-Client-Swift', '~> 16.0.1'
   pod 'Alamofire', '~> 5.2'
   pod 'RxSwift', '~> 5'
 

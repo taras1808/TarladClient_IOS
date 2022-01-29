@@ -18,7 +18,7 @@ class MainViewController: UIViewController {
     var chats: [Chat] = []
     var messages: [Message] = []
     var users: [User] = []
-    var chatLists: [Int64: Set<User>] = [:]
+    var chatLists: [Int: Set<User>] = [:]
     
     let disposeBag = DisposeBag()
     
@@ -48,7 +48,7 @@ class MainViewController: UIViewController {
     
     @IBAction func unwindToMain(unwindSegue: UIStoryboardSegue) {
         self.vm.page = 0
-        self.vm.time = Int64(Date().timeIntervalSince1970 * 1000)
+        self.vm.time = Int(Date().timeIntervalSince1970 * 1000)
         self.chats = []
         self.messages = []
         self.users = []

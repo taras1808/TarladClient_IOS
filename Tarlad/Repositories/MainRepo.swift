@@ -11,7 +11,7 @@ import RxSwift
 
 protocol MainRepo {
     
-    func getMessage(page: Int64, time: Int64) -> Observable<Set<Message>>
+    func getMessage(page: Int, time: Int) -> Observable<Set<Message>>
     
     func observeMessages() -> Observable<Set<Message>>
     
